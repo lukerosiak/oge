@@ -31,6 +31,7 @@ class Command(BaseCommand):
         self.nextpage(driver)
 
         #stop selenium
+        time.sleep(5)
         urllib2.urlopen('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer')
 
         """Loop over all individuals to check for their records"""
