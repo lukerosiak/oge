@@ -1,3 +1,8 @@
+import time
+import os
+import commands
+import urllib2
+
 from BeautifulSoup import BeautifulSoup
 from selenium.webdriver.support.ui import Select
 from selenium import webdriver
@@ -13,21 +18,26 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
          
-        #~/apps$ java -jar selenium-server-standalone-2.28.0.jar
-       
+        #start selenium 
+        os.system("java -jar /home/luke/apps/selenium-server-standalone-2.28.0.jar &")
+        time.sleep(20)
+        
         driver = webdriver.Remote("http://localhost:4444/wd/hub", webdriver.DesiredCapabilities.HTMLUNIT)        
         driver.get("http://www.oge.gov/Open-Government/Access-Records/Current-Executive-Branch-Nominations-and-Appointments/")
 
         select = Select(driver.find_element_by_tag_name("select"))        
         select.select_by_visible_text("100")
 
-        self.nextpage(driver)
+        #self.nextpage(driver)
 
+
+        #stop selenium
+        urllib2.urlopen('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer')
 
         """Loop over all individuals to check for their records"""
-        o = Official.objects.all().order_by('lastchecked')
-        for oo in o:
-            oo.check()
+        #o = Official.objects.all().order_by('lastchecked')
+        #for oo in o:
+        #    oo.check()
 
 
     def nextpage(self,driver):
