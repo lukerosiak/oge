@@ -28,16 +28,15 @@ class Command(BaseCommand):
         select = Select(driver.find_element_by_tag_name("select"))        
         select.select_by_visible_text("100")
 
-        #self.nextpage(driver)
-
+        self.nextpage(driver)
 
         #stop selenium
         urllib2.urlopen('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer')
 
         """Loop over all individuals to check for their records"""
-        #o = Official.objects.all().order_by('lastchecked')
-        #for oo in o:
-        #    oo.check()
+        o = Official.objects.all().order_by('lastchecked')
+        for oo in o:
+            oo.check()
 
 
     def nextpage(self,driver):
