@@ -65,7 +65,7 @@ class Document(models.Model):
 
     def link(self):
         if self.url and self.url!='':
-            return '<a href="%s">PDF</a>' % self.url
+            return '<a href="http://www.oge.gov%s">PDF</a>' % self.url
         else:
             return '<a href="http://www.oge.gov%s">Download from WH</a>' % self.official.id
 
