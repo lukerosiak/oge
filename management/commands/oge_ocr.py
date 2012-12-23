@@ -1,9 +1,17 @@
 import os
 import commands 
+import datetime
+
+import smtplib
+from email.MIMEText import MIMEText
 
 from django.core.management.base import BaseCommand, CommandError
 
 from quarterback.oge.models import *
+
+EMAILS = True
+emails = ['lrosiak@gmail.com','jmcelhatton@washingtontimes.com']
+
 
 
 class Command(BaseCommand):
@@ -49,3 +57,22 @@ class Command(BaseCommand):
 
             else:
                 done = True
+
+
+        if EMAILS:
+            """email new documents"""
+            
+            yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+            docs = Document.objects.filter(firstfound__gte=yesterday)
+            
+            text = 'http://lukerosiak.info/oge<br/><br/>' + '<br/>-----------<br/>'.join([doc.__unicode__() + '<br/><br/>' + doc.text.replace('\n','<br/>') for doc in docs])
+            text = text.encode('utf')
+            
+            msg = MIMEText(text,'html')
+            msg['From'] = 'fecquarterback@lukerosiak.info'
+            msg['To'] = ', '.join( emails )
+            msg['Subject'] = '[Efiling:] %s New White House ethics letter(s)' % docs.count()
+            s = smtplib.SMTP('localhost')
+            s.sendmail('fecquarterback@lukerosiak.info', emails, msg.as_string())
+            
+    

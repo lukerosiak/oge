@@ -13,7 +13,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
          
-                
+        #~/apps$ java -jar selenium-server-standalone-2.28.0.jar
+       
         driver = webdriver.Remote("http://localhost:4444/wd/hub", webdriver.DesiredCapabilities.HTMLUNIT)        
         driver.get("http://www.oge.gov/Open-Government/Access-Records/Current-Executive-Branch-Nominations-and-Appointments/")
 

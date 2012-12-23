@@ -44,6 +44,8 @@ class Official(models.Model):
                 if (name,date,url) not in existing:
                     self.document_set.create(name=name,url=url,date=date)
                     
+        self.lastchecked = datetime.datetime.now()
+        self.save()
 
                     
                     
@@ -61,7 +63,7 @@ class Document(models.Model):
     triedocr = models.CharField(max_length=1,blank=True)
     
     def __unicode__(self):
-        return "%s" % self.name 
+        return "%s | %s | %s | %s | %s" % (self.official.name, self.official.agency, self.official.position, self.name, self.link()) 
 
     def link(self):
         if self.url and self.url!='':
