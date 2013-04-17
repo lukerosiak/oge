@@ -78,6 +78,8 @@ class Command(BaseCommand):
             agency = cells[1].text.encode('utf')
             position = cells[2].text.encode('utf')
          
+            print name
+         
             o = Official(id=id)
             o.name = name
             o.agency = agency
