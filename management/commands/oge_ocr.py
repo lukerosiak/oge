@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand, CommandError
 from quarterback.oge.models import *
 
 EMAILS = True
-emails = ['lrosiak@gmail.com','jmcelhatton@washingtontimes.com']
+emails = ['lrosiak@gmail.com',]
 
 
 
@@ -65,14 +65,16 @@ class Command(BaseCommand):
             yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
             docs = Document.objects.filter(firstfound__gte=yesterday)
             
-            text = 'http://lukerosiak.info/oge<br/><br/>' + '<br/>-----------<br/>'.join([doc.__unicode__() + '<br/><br/>' + doc.text.replace('\n','<br/>') for doc in docs])
-            text = text.encode('utf')
+            if len(docs):
             
-            msg = MIMEText(text,'html')
-            msg['From'] = 'fecquarterback@lukerosiak.info'
-            msg['To'] = ', '.join( emails )
-            msg['Subject'] = '[Efiling:] %s New White House ethics letter(s)' % docs.count()
-            s = smtplib.SMTP('localhost')
-            s.sendmail('fecquarterback@lukerosiak.info', emails, msg.as_string())
+                text = 'http://lukerosiak.info/oge<br/><br/>' + '<br/>-----------<br/>'.join([doc.__unicode__() + '<br/><br/>' + doc.text.replace('\n','<br/>') for doc in docs])
+                text = text.encode('utf')
+                
+                msg = MIMEText(text,'html')
+                msg['From'] = 'fecquarterback@lukerosiak.info'
+                msg['To'] = ', '.join( emails )
+                msg['Subject'] = '[Efiling:] %s New White House ethics letter(s)' % docs.count()
+                s = smtplib.SMTP('localhost')
+                s.sendmail('fecquarterback@lukerosiak.info', emails, msg.as_string())
             
     

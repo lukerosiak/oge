@@ -12,6 +12,9 @@ from django.core.management.base import BaseCommand, CommandError
 
 from quarterback.oge.models import *
 
+import boto
+from boto.s3.key import Key
+from quarterback.oge.aws import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET
 
 class Command(BaseCommand):
     help = 'Check index for new government officials.'
@@ -37,7 +40,23 @@ class Command(BaseCommand):
         """Loop over all individuals to check for their records"""
         o = Official.objects.all().order_by('lastchecked')
         for oo in o:
+            print oo.name
             oo.check()
+
+        print 'baking to s3'
+        results = Document.objects.all().order_by('-date')
+
+        t = loader.get_template('oge_index.html')
+        c = Context({'results': results, 'q': '' })
+        rendered = t.render(c)
+
+        #there are a lot of disclosures, so bake a static HTML page to Amazon S3 rather than loading it dynamically
+        conn_s3 = boto.connect_s3(AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY)
+        bucket = conn_s3.get_bucket(AWS_BUCKET)
+        k=Key(bucket,'oge.html')
+        k.set_metadata('Content-Type', 'text/html')
+        k.set_contents_from_string(rendered, policy='public-read')
+
 
 
     def nextpage(self,driver):
