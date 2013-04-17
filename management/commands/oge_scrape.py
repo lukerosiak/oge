@@ -31,6 +31,10 @@ class Command(BaseCommand):
         select = Select(driver.find_element_by_tag_name("select"))        
         select.select_by_visible_text("100")
 
+        links = driver.find_elements_by_id('ctl00_ctl00_MiddleCPH_CenterContentCPH_1a')
+        if links:
+            links[0].click()
+
         self.nextpage(driver)
 
         #stop selenium
