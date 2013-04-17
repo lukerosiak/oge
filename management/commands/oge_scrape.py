@@ -9,6 +9,7 @@ from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from django.core.management.base import BaseCommand, CommandError
+from django.template import loader, Context
 
 from quarterback.oge.models import *
 
@@ -41,20 +42,24 @@ class Command(BaseCommand):
         time.sleep(5)
         urllib2.urlopen('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer')
 
-        """Loop over all individuals to check for their records"""
+        #Loop over all individuals to check for their records
         o = Official.objects.all().order_by('lastchecked')
         for oo in o:
             print oo.name
             oo.check()
 
         print 'baking to s3'
-        results = Document.objects.all().order_by('-date')
+        self.bake()
 
+    def bake(self):
+        #there are a lot of disclosures, so bake a static HTML page to Amazon S3 rather than loading it dynamically
+
+        results = Document.objects.all().order_by('-date')
         t = loader.get_template('oge_index.html')
-        c = Context({'results': results, 'q': '' })
+        now = datetime.datetime.today()
+        c = Context({'results': results, 'q': '', 'updated': now })
         rendered = t.render(c)
 
-        #there are a lot of disclosures, so bake a static HTML page to Amazon S3 rather than loading it dynamically
         conn_s3 = boto.connect_s3(AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY)
         bucket = conn_s3.get_bucket(AWS_BUCKET)
         k=Key(bucket,'oge.html')
