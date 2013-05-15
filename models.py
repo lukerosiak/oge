@@ -5,6 +5,8 @@ import urllib2
        
 from BeautifulSoup import BeautifulSoup        
         
+def removeNonAscii(s): return "".join(i for i in s if ord(i)<128)        
+        
 class Official(models.Model):
     id = models.TextField(primary_key=True)
     name = models.TextField(max_length=1200)
@@ -23,7 +25,7 @@ class Official(models.Model):
         url = "http://www.oge.gov%s" % self.id
         html = urllib2.urlopen(url).read()
         
-        if self.name not in html:
+        if self.name not in removeNonAscii(html):
             #this may be a 404--the official may have been deleted
             print self.id, self.name, 'appears to be deleted!'
             self.removed = 'Y'
