@@ -11,6 +11,7 @@ class Official(models.Model):
     agency = models.TextField(max_length=1200)
     position = models.TextField(max_length=1200)
     lastchecked = models.DateTimeField()
+    removed = models.CharField(max_length=1)
 
     def __unicode__(self):
         return "%s" % self.name 
@@ -21,6 +22,15 @@ class Official(models.Model):
 
         url = "http://www.oge.gov%s" % self.id
         html = urllib2.urlopen(url).read()
+        
+        if self.name not in html:
+            #this may be a 404--the official may have been deleted
+            print self.id, self.name, 'appears to be deleted!'
+            self.removed = 'Y'
+            self.lastchecked = datetime.datetime.now()
+            self.save()
+            return
+        
         soup = BeautifulSoup(html)
         
         tables = soup.findAll('table',{'class':"accessRecords inCart"})
@@ -28,14 +38,13 @@ class Official(models.Model):
             rows = table.tbody.findAll('tr')
             for row in rows:
                 cells = row.findAll('td')
-                name = row.th.text
+                name = row.th.text.replace('*','')
                 date = cells[0].text
                 try:
                     date = datetime.datetime.strptime(date,'%m/%d/%Y')
                 except:
-                    print 'couldnt format date'
+                    print 'couldnt format date', date
                     date = datetime.date.today()
-                    pass
                 if cells[1].a:
                     url = cells[1].a['href']
                 else:
@@ -43,8 +52,8 @@ class Official(models.Model):
                 
                 if (name,date,url) not in existing:
                     self.document_set.create(name=name,url=url,date=date)
-                    
-        self.lastchecked = datetime.datetime.now()
+
+        self.lastchecked = datetime.datetime.now()                    
         self.save()
 
                     
@@ -65,9 +74,18 @@ class Document(models.Model):
     def __unicode__(self):
         return "%s | %s | %s | %s | %s" % (self.official.name, self.official.agency, self.official.position, self.name, self.link()) 
 
+    def official_name(self):
+        s = self.official.name
+        if self.official.removed=='Y':
+            s += ' [APPEARS TO HAVE BEEN REMOVED FROM OFFICIAL SITE]'
+        return s
+
     def link(self):
         if self.url and self.url!='':
-            return '<a href="http://www.oge.gov%s">PDF</a>' % self.url
+            if self.triedocr=='Y':
+                return '<a href="http://www.oge.gov%s">PDF</a> | <a href="http://lukerosiak.info/oge/%s" target="new">Text</a>' % (self.url,self.id)            
+            else:
+                return '<a href="http://www.oge.gov%s">PDF</a>' % self.url
         else:
             return '<a href="http://www.oge.gov%s">Download from WH</a>' % self.official.id
 

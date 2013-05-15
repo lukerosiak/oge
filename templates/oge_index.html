@@ -88,6 +88,8 @@
 
 <p>You can search for text within some of the forms by entering it here, but because the forms are scanned images of pieces of paper, text search is not always reliable:</p>
 
+<p>In May 2013, the White House removed more than 100 conflict of interest documents without explanation. That will be noted in the name field; the PDFs will be gone, but you can click "text" to see my OCR'd version.</p>
+
 <form method="get" action="http://www.lukerosiak.info/oge/">
 <input type="text" name="q" value="{{q}}" style="width:40em"/>
 <input type="submit"/>{%if q%}<a href="/oge/">Resume viewing all documents</a> Full text of matching documents appears below the results table.{%endif%}
@@ -116,7 +118,7 @@
 <ul>
 {%for line in results%}
 <li>
-<b>{{line.official.name}} | {{line.official.agency}} | {{line.official.position}} | {{line.date}} | {{line.link|safe}}</b>
+<b>{{line.official_name}} | {{line.official.agency}} | {{line.official.position}} | {{line.date}} | {{line.link|safe}}</b>
 <p>{{line.text|linebreaks}}</p>
 </li>
 {%endfor%}

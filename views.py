@@ -15,4 +15,10 @@ def index(request):
     return render_to_response('oge_index.html', {'results': results, 'q': q })
 
 
+def text(request,id):
+
+    result = Document.objects.get(pk=id)
+           
+    return HttpResponse('<html><body><pre>%s</pre></body</html>' % result.text)
+
 
