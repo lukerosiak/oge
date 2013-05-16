@@ -25,7 +25,7 @@ class Official(models.Model):
         url = "http://www.oge.gov%s" % self.id
         html = urllib2.urlopen(url).read()
         
-        if self.name not in removeNonAscii(html):
+        if 'TKs Dog Training Season' in removeNonAscii(html):
             #this may be a 404--the official may have been deleted
             print self.id, self.name, 'appears to be deleted!'
             self.removed = 'Y'
