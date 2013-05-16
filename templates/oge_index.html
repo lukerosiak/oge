@@ -108,7 +108,7 @@
 <thead><tr><th>Name</th><th>Agency</th><th>Position</th><th>Document</th><th>Date</th><th>Pages</th></tr></thead>
 <tbody>
 {%for line in results%}
-<tr><td>{{line.official.name}}</td><td>{{line.official.agency}}</td><td>{{line.official.position}}</td><td>{{line.name}} {{line.link|safe}}</td><td>{{line.date}}</td><td>{%if line.pages%}{{line.pages}}{%endif%}</td></tr>
+<tr><td>{{line.official_name}}</td><td>{{line.official.agency}}</td><td>{{line.official.position}}</td><td>{{line.name}} {{line.link|safe}}</td><td>{{line.date}}</td><td>{%if line.pages%}{{line.pages}}{%endif%}</td></tr>
 {%endfor%}
 </tbody>
 </table>
@@ -118,7 +118,7 @@
 <ul>
 {%for line in results%}
 <li>
-<b>{{line.official_name}} | {{line.official.agency}} | {{line.official.position}} | {{line.date}} | {{line.link|safe}}</b>
+<b>{{line.official.name}} | {{line.official.agency}} | {{line.official.position}} | {{line.date}} | {{line.link|safe}}</b>
 <p>{{line.text|linebreaks}}</p>
 </li>
 {%endfor%}

@@ -40,7 +40,7 @@ class Official(models.Model):
             rows = table.tbody.findAll('tr')
             for row in rows:
                 cells = row.findAll('td')
-                name = row.th.text.replace('*','')
+                name = row.th.text
                 date = cells[0].text
                 try:
                     date = datetime.datetime.strptime(date,'%m/%d/%Y')
@@ -54,6 +54,9 @@ class Official(models.Model):
                 
                 if (name,date,url) not in existing:
                     self.document_set.create(name=name,url=url,date=date)
+                    print 'existing:'
+                    print existing
+                    print 'creating %s %s %s' % (name, url, date)
 
         self.lastchecked = datetime.datetime.now()                    
         self.save()
