@@ -43,7 +43,7 @@ class Command(BaseCommand):
         urllib2.urlopen('http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer')
 
         #Loop over all individuals to check for their records
-        o = Official.objects.all().order_by('lastchecked')
+        o = Official.objects.exclude(removed='Y').order_by('lastchecked')
         for oo in o:
             print oo.name
             oo.check()

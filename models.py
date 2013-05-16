@@ -20,7 +20,8 @@ class Official(models.Model):
 
     def check(self):
 
-        existing = [(x.name,x.date,x.url) for x in self.document_set.all()]
+        existing = [(x.name,x.date) for x in self.document_set.all()]
+        existing_urls = [x.url for x in self.document_set.all()]
 
         url = "http://www.oge.gov%s" % self.id
         html = urllib2.urlopen(url).read()
@@ -43,7 +44,7 @@ class Official(models.Model):
                 name = row.th.text
                 date = cells[0].text
                 try:
-                    date = datetime.datetime.strptime(date,'%m/%d/%Y')
+                    date = datetime.datetime.strptime(date,'%m/%d/%Y').date()
                 except:
                     print 'couldnt format date', date
                     date = datetime.date.today()
@@ -52,7 +53,7 @@ class Official(models.Model):
                 else:
                     url = ''
                 
-                if (name,date,url) not in existing:
+                if ((name,date) not in existing and url=='') or url not in existing_urls:
                     self.document_set.create(name=name,url=url,date=date)
                     print 'existing:'
                     print existing
