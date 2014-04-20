@@ -1,28 +1,13 @@
 {% load humanize %}<html><head><title>White House ethics disclosures</title>
 
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.js"></script>
-
-	<!-- Tablesorter -->
-    <link rel="stylesheet" href="http://s3.amazonaws.com/wtmedia/libraries/theme.blue.css">
-	<script src="http://s3.amazonaws.com/wtmedia/libraries/jquery.tablesorter.js"></script>
-	<script src="http://s3.amazonaws.com/wtmedia/libraries/jquery.tablesorter.widgets.js"></script>
-
-	<link class="ui-theme" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/cupertino/jquery-ui.css">
-	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7/jquery-ui.min.js"></script>
-	<link rel="stylesheet" href="http://s3.amazonaws.com/wtmedia/libraries/jq.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.js"></script>
+<script src="http://s3.amazonaws.com/content.washingtonexaminer.biz/exography/libraries/tablesorter/jquery.tablesorter.js"></script>
+	
+<link rel="stylesheet" href="http://s3.amazonaws.com/wtmedia/libraries/theme.blue.css">
 
 
-
-	<script>
-	$(function(){
-		$('.accordion').accordion({
-			autoHeight: false,
-			collapsible : true
-		});
-	});
-	</script>
-
-	<script id="js">$(function() {
+<script id="js">
+$(function() {
 
 	// call the tablesorter plugin
 	$("#table").tablesorter({
@@ -37,62 +22,26 @@
 		widthFixed : true,
 
 		// initialize zebra striping and filter widgets
-		widgets: ["zebra", "filter"],
-
-		widgetOptions : {
-
-			// if true, a filter will be added to the top of each table column;
-			// disabled by using -> headers: { 1: { filter: false } } OR add class="filter-false"
-			// if you set this to false, make sure you perform a search using the second method below
-			filter_columnFilters : true,
-
-			// css class applied to the table row containing the filters & the inputs within that row
-			filter_cssFilter : 'tablesorter-filter',
-
-			// if true, filters are collapsed initially, but can be revealed by hovering over the grey bar immediately
-			// below the header row. Additionally, tabbing through the document will open the filter row when an input gets focus
-			filter_hideFilters : false,
-
-			// Set this option to false to make the searches case sensitive
-			filter_ignoreCase : true,
-
-			// Delay in milliseconds before the filter widget starts searching; This option prevents searching for
-			// every character while typing and should make searching large tables faster.
-			filter_searchDelay : 300,
-
-			// Set this option to true to use the filter to find text from the start of the column
-			// So typing in "a" will find "albert" but not "frank", both have a's; default is false
-			filter_startsWith : false,
-
-			// Filter using parsed content for ALL columns
-			// be careful on using this on date columns as the date is parsed and stored as time in seconds
-			filter_useParsedData : false
-
-		}
+		widgets: ["zebra"]
 
 	});
 
 });</script>
 
-
 </head>
-
 <body>
 
 <h1 style="font-size:16pt">White House ethics disclosures</h1>
-
-<p>Monitor and search new White House ethics disclosures, as posted to <a href="http://www.oge.gov/Open-Government/Access-Records/Current-Executive-Branch-Nominations-and-Appointments/">this web page.</a> ("This database contains records pertaining to individuals nominated by President Obama and to individuals who have declared their candidacy for the Office of President of the United States.)"</p>
-
-<p>By Luke Rosiak</p>
+<p>By <a href="www.lukerosiak.info">Luke Rosiak</a></p>
 <p>{%if updated%}Updated {{updated}}{%endif%}</p>
 
-<p>You can search for text within some of the forms by entering it here, but because the forms are scanned images of pieces of paper, text search is not always reliable:</p>
+<p>Monitor and search new White House ethics disclosures, as posted to <a href="http://www.oge.gov/Open-Government/Access-Records/Current-Executive-Branch-Nominations-and-Appointments/">this web page.</a> ("This database contains records pertaining to individuals nominated by President Obama and to individuals who have declared their candidacy for the Office of President of the United States.)" Click "PDF" or "Text" to see the disclosure.</p>
 
-<p>In May 2013, the White House removed more than 100 conflict of interest documents without explanation. That will be noted in the name field; the PDFs will be gone, but you can click "text" to see my OCR'd version.</p>
+<p>You can search by name, agency, position, <em>or by text appearing in the document, such as companies they have an interest in</em>, by entering it here. This site uses OCR to make the PDFs themselves searchable.</p>
 
-<form method="get" action="http://www.lukerosiak.info/oge/">
+<form method="get" action="/oge/">
 <input type="text" name="q" value="{{q}}" style="width:40em"/>
-<input type="submit"/>{%if q%}<a href="/oge/">Resume viewing all documents</a> Full text of matching documents appears below the results table.{%endif%}
+<input type="submit"/>{%if q%}<a href="/oge/">Resume viewing all documents</a> Full text of matching documents appears below the results table. Use CTRL-F to locate your search within them.{%endif%}
 </form>
 
 
@@ -108,7 +57,7 @@
 <thead><tr><th>Name</th><th>Agency</th><th>Position</th><th>Document</th><th>Date</th><th>Pages</th></tr></thead>
 <tbody>
 {%for line in results%}
-<tr><td>{{line.official_name}}</td><td>{{line.official.agency}}</td><td>{{line.official.position}}</td><td>{{line.name}} {{line.link|safe}}</td><td>{{line.date}}</td><td>{%if line.pages%}{{line.pages}}{%endif%}</td></tr>
+<tr><td>{{line.official_name}}</td><td>{{line.official_agency}}</td><td>{{line.official_position}}</td><td>{{line.name}} {{line.link|safe}}</td><td>{{line.date}}</td><td>{%if line.pages%}{{line.pages}}{%endif%}</td></tr>
 {%endfor%}
 </tbody>
 </table>
@@ -117,26 +66,29 @@
 {%if q%}
 <ul>
 {%for line in results%}
+{%if line.text%}
 <li>
-<b>{{line.official.name}} | {{line.official.agency}} | {{line.official.position}} | {{line.date}} | {{line.link|safe}}</b>
+<b><a name="{{line.pk}}">{{line.header}} | {{line.date}} | {{line.link|safe}}</a></b>
 <p>{{line.text|linebreaks}}</p>
 </li>
+{%endif%}
 {%endfor%}
 </ul>
 {%endif%}
 
-<script type="text/javascript">
 
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-36248259-1']);
-  _gaq.push(['_trackPageview']);
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-36248259-2', 'lukerosiak.info');
+  ga('send', 'pageview');
 
 </script>
+
+
 
 </html></body>

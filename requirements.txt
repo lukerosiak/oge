@@ -1,0 +1,4 @@
+BeautifulSoup
+selenium
+djorm-ext-pgfulltext
+

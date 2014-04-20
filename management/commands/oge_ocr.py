@@ -7,15 +7,12 @@ from email.MIMEText import MIMEText
 
 from django.core.management.base import BaseCommand, CommandError
 
-from quarterback.oge.models import *
-
-EMAILS = True
-emails = ['lrosiak@gmail.com',]
-
+from oge.models import *
+from oge.config import *
 
 
 class Command(BaseCommand):
-    help = 'Check index for new government officials.'
+    help = 'OCR recently downloaded PDFs and store their text.'
 
     def handle(self, *args, **options):
          

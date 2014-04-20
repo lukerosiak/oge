@@ -11,11 +11,9 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from django.core.management.base import BaseCommand, CommandError
 from django.template import loader, Context
 
-from quarterback.oge.models import *
+from oge.models import *
+from oge.config import *
 
-import boto
-from boto.s3.key import Key
-from quarterback.oge.aws import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET
 
 class Command(BaseCommand):
     help = 'Check index for new government officials.'
@@ -23,7 +21,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
          
         #start selenium 
-        os.system("java -jar /home/luke/apps/selenium-server-standalone-2.28.0.jar &")
+        os.system("java -jar %s &" % SELENIUM_LOCATION)
         time.sleep(20)
         
         driver = webdriver.Remote("http://localhost:4444/wd/hub", webdriver.DesiredCapabilities.HTMLUNIT)        
@@ -48,23 +46,6 @@ class Command(BaseCommand):
             print oo.name
             oo.check()
 
-        print 'baking to s3'
-        self.bake()
-
-    def bake(self):
-        #there are a lot of disclosures, so bake a static HTML page to Amazon S3 rather than loading it dynamically
-
-        results = Document.objects.all().order_by('-date')
-        t = loader.get_template('oge_index.html')
-        now = datetime.datetime.today()
-        c = Context({'results': results, 'q': '', 'updated': now })
-        rendered = t.render(c)
-
-        conn_s3 = boto.connect_s3(AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY)
-        bucket = conn_s3.get_bucket(AWS_BUCKET)
-        k=Key(bucket,'oge.html')
-        k.set_metadata('Content-Type', 'text/html')
-        k.set_contents_from_string(rendered, policy='public-read')
 
 
 
@@ -78,7 +59,7 @@ class Command(BaseCommand):
 
         for row in soup.tbody.findAll('tr'):
             cells = row.findAll('td')
-            id = cells[0].a['href'].encode('utf')
+            id = cells[0].a['href'].encode('utf').split('=')[-1]
             name = cells[0].text.encode('utf')
             agency = cells[1].text.encode('utf')
             position = cells[2].text.encode('utf')
